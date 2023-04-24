@@ -1,0 +1,24 @@
+{
+  "type": "module",
+  "name": "hand-controls",
+  "version": "1.0.0",
+  "description": "한 번 만들어보고 싶었는데 시간이 없네",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/testprocess/hand-controls.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/testprocess/hand-controls/issues"
+  },
+  "homepage": "https://github.com/testprocess/hand-controls#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "express-handlebars": "^7.0.7"
+  }
+}
