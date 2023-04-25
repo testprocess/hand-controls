@@ -27,16 +27,36 @@ class HandDetect {
             },
             numHands: 2
         });
+
+
+    }
+
+    async getDistance(a, b) {
+        return Math.sqrt(((b.x - a.x)**2) + ((b.y - a.y)**2) + ((b.z - a.z)**2))
     }
 
     async getLandmarks() {
-        await this.handLandmarker.setOptions({ runningMode: "VIDEO" });
-
         let lastVideoTime = -1;
+
+        if (lastVideoTime == -1) {
+            await this.handLandmarker.setOptions({ runningMode: "VIDEO" });
+
+        }
+
         const detections = this.handLandmarker.detectForVideo(this.video, lastVideoTime);
-        console.log(detections.landmarks)
         lastVideoTime = this.video.currentTime;
+
+        console.log(detections)
+
+        if (detections.landmarks.length == 2) {
+            const dist = await this.getDistance(detections.landmarks[0][12], detections.landmarks[1][12])
+            console.log(dist)
+
+        }
+
+
     
+
         requestAnimationFrame(this.getLandmarks.bind(this));
     }
 
@@ -92,6 +112,7 @@ class Screen {
         hemiLight.position.set( 0, 120, 0 );
         this.scene.add(hemiLight);
     }
+
 }
 
 new Screen()
