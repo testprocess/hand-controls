@@ -5,6 +5,7 @@ class HandDetect {
     constructor() {
         this.webcamRunning = false
         this.video = document.getElementById("webcam");
+        this.scale = 1
 
         this.init()
     }
@@ -46,16 +47,10 @@ class HandDetect {
         const detections = this.handLandmarker.detectForVideo(this.video, lastVideoTime);
         lastVideoTime = this.video.currentTime;
 
-        console.log(detections)
-
         if (detections.landmarks.length == 2) {
             const dist = await this.getDistance(detections.landmarks[0][12], detections.landmarks[1][12])
-            console.log(dist)
-
+            this.scale = dist + 1
         }
-
-
-    
 
         requestAnimationFrame(this.getLandmarks.bind(this));
     }
@@ -77,6 +72,7 @@ class Screen {
         this.camera = undefined
         this.renderer = undefined
         this.controls = undefined
+        this.cube = undefined
 
         this.init()
 
@@ -111,9 +107,25 @@ class Screen {
         const hemiLight = new THREE.HemisphereLight( 0x707070, 0x444444 );
         hemiLight.position.set( 0, 120, 0 );
         this.scene.add(hemiLight);
+
+        this.addCube()
+        this.animate();
     }
 
+    animate() {
+        requestAnimationFrame( this.animate.bind(this) );
+        
+        this.cube.scale.set(hand.scale**3,hand.scale**3,hand.scale**3);
+        this.renderer.render( this.scene, this.camera );
+    }
+
+    addCube() {
+        const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+        const material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
+        this.cube = new THREE.Mesh( geometry, material );
+        this.scene.add( this.cube );
+    }
 }
 
-new Screen()
-new HandDetect()
+const hand = new HandDetect()
+const screen = new Screen()
