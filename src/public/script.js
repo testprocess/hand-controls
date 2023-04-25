@@ -1,4 +1,4 @@
-import { HandLandmarker, FilesetResolver } from "https://cdn.skypack.dev/@mediapipe/tasks-vision@0.1.0-alpha-11";
+import { HandLandmarker, FilesetResolver } from "https://cdn.skypack.dev/@mediapipe/tasks-vision@latest";
 
 
 class HandDetect {
@@ -6,6 +6,7 @@ class HandDetect {
         this.webcamRunning = false
         this.video = document.getElementById("webcam");
         this.scale = 1
+        this.lastVideoTime = -1;
 
         this.init()
     }
@@ -37,22 +38,20 @@ class HandDetect {
     }
 
     async getLandmarks() {
-        let lastVideoTime = -1;
 
-        if (lastVideoTime == -1) {
+        if (this.lastVideoTime == -1) {
             await this.handLandmarker.setOptions({ runningMode: "VIDEO" });
-
         }
 
-        const detections = this.handLandmarker.detectForVideo(this.video, lastVideoTime);
-        lastVideoTime = this.video.currentTime;
+        const detections = this.handLandmarker.detectForVideo(this.video, this.lastVideoTime);
+        this.lastVideoTime = this.video.currentTime;
 
         if (detections.landmarks.length == 2) {
             const dist = await this.getDistance(detections.landmarks[0][12], detections.landmarks[1][12])
             this.scale = dist + 1
         }
 
-        requestAnimationFrame(this.getLandmarks.bind(this));
+        window.requestAnimationFrame(this.getLandmarks.bind(this));
     }
 
     async enableCam() {      
