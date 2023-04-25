@@ -1,4 +1,55 @@
+import { HandLandmarker, FilesetResolver } from "https://cdn.skypack.dev/@mediapipe/tasks-vision@0.1.0-alpha-11";
 
+
+class HandDetect {
+    constructor() {
+        this.webcamRunning = false
+        this.video = document.getElementById("webcam");
+
+        this.init()
+    }
+
+    async init() {
+        await this.estimate()
+        await this.enableCam()
+    }
+
+    async estimate() {
+        this.vision = await FilesetResolver.forVisionTasks(
+            "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
+        );
+
+        this.handLandmarker = await HandLandmarker.createFromOptions(
+            this.vision,
+            {
+            baseOptions: {
+                modelAssetPath: "https://storage.googleapis.com/mediapipe-assets/hand_landmarker.task"
+            },
+            numHands: 2
+        });
+    }
+
+    async getLandmarks() {
+        await this.handLandmarker.setOptions({ runningMode: "VIDEO" });
+
+        let lastVideoTime = -1;
+        const detections = this.handLandmarker.detectForVideo(this.video, lastVideoTime);
+        console.log(detections.landmarks)
+        lastVideoTime = this.video.currentTime;
+    
+        requestAnimationFrame(this.getLandmarks.bind(this));
+    }
+
+    async enableCam() {      
+        navigator.mediaDevices.getUserMedia({
+            video: true
+        }).then((stream) => {
+            this.video.srcObject = stream;
+            this.video.addEventListener("loadeddata", this.getLandmarks.bind(this));
+        });
+    }
+    
+}
 
 class Screen {
     constructor() {
@@ -44,3 +95,4 @@ class Screen {
 }
 
 new Screen()
+new HandDetect()
