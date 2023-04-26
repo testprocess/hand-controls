@@ -59,9 +59,12 @@ class HandDetect {
             const angleY1 = await this.getAngle(detections.landmarks[0][12], detections.landmarks[0][4], 'y', 'z')
             const angleY2 = await this.getAngle(detections.landmarks[1][12], detections.landmarks[1][4], 'y', 'z')
 
+            const fitAngleZ = - angleZ * (Math.PI / 180)
+            const fitAngleY = Math.abs(- ((angleY1 + angleY2) / 2) * (Math.PI / 180) )
+
             this.scale = dist + 1
-            this.angleZ = - angleZ * (Math.PI / 180)
-            this.angleY = - ((angleY1 + angleY2) / 2) * (Math.PI / 180)
+            this.angleZ = fitAngleZ
+            this.angleY = fitAngleY
         }
 
         window.requestAnimationFrame(this.getLandmarks.bind(this));
