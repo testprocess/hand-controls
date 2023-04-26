@@ -6,6 +6,9 @@ class HandDetect {
         this.webcamRunning = false
         this.video = document.getElementById("webcam");
         this.scale = 1
+        this.angleZ = 0
+        this.angleY = 0
+
         this.lastVideoTime = -1;
 
         this.init()
@@ -37,6 +40,10 @@ class HandDetect {
         return Math.sqrt(((b.x - a.x)**2) + ((b.y - a.y)**2) + ((b.z - a.z)**2))
     }
 
+    async getAngle(a, b, targetXCoord, targetYCoord) {
+        return Math.atan2(a[targetYCoord] - b[targetYCoord], a[targetXCoord] - b[targetXCoord]) * 180 / Math.PI;
+    }
+
     async getLandmarks() {
 
         if (this.lastVideoTime == -1) {
@@ -48,7 +55,13 @@ class HandDetect {
 
         if (detections.landmarks.length == 2) {
             const dist = await this.getDistance(detections.landmarks[0][12], detections.landmarks[1][12])
+            const angleZ = await this.getAngle(detections.landmarks[0][9], detections.landmarks[1][9], 'x', 'y')
+            const angleY1 = await this.getAngle(detections.landmarks[0][12], detections.landmarks[0][4], 'y', 'z')
+            const angleY2 = await this.getAngle(detections.landmarks[1][12], detections.landmarks[1][4], 'y', 'z')
+
             this.scale = dist + 1
+            this.angleZ = - angleZ * (Math.PI / 180)
+            this.angleY = - ((angleY1 + angleY2) / 2) * (Math.PI / 180)
         }
 
         window.requestAnimationFrame(this.getLandmarks.bind(this));
@@ -71,7 +84,7 @@ class Screen {
         this.camera = undefined
         this.renderer = undefined
         this.controls = undefined
-        this.cube = undefined
+        this.mesh = undefined
 
         this.init()
 
@@ -107,15 +120,38 @@ class Screen {
         hemiLight.position.set( 0, 120, 0 );
         this.scene.add(hemiLight);
 
-        this.addCube()
+        this.addModel('/public/rocket.glb')
         this.animate();
     }
 
     animate() {
         requestAnimationFrame( this.animate.bind(this) );
-        
-        this.cube.scale.set(hand.scale**3,hand.scale**3,hand.scale**3);
+
+        try {
+            this.mesh.scale.set(hand.scale**3,hand.scale**3,hand.scale**3);
+            this.mesh.rotation.set(hand.angleY, 0, hand.angleZ)
+        } catch (error) {
+            
+        }
+
         this.renderer.render( this.scene, this.camera );
+    }
+
+    addModel(path) {
+        const loader = new THREE.GLTFLoader();
+    
+        loader.load(path, ( gltf ) => {
+                this.mesh = gltf.scene
+                this.mesh.receiveShadow = true;
+                this.scene.add( this.mesh );
+            },
+            function ( xhr ) {
+                console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+            },
+            function ( error ) {
+                console.log( 'An error happened' );
+            }
+        );
     }
 
     addCube() {

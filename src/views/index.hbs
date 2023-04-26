@@ -13,11 +13,28 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/rainbow/1.2.0/themes/github.min.css" integrity="sha512-dqCmbGxLwDqQYmI+Dr0LAWG21trYGnqIaw+yuyfmLXTmb8tiZyvOeqQqmJbZWv7UpzUeRV9Zj6QTKMw4eMSiHw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
 
+    <style>
+        #app {
+            position: absolute;
+        }
+
+        #webcam {
+            width: 20%;
+            position: absolute;
+            top: 2%;
+            left: 2.7%;
+            border-radius: 0.7rem;
+            transform: rotateY(180deg);
+            -webkit-transform:rotateY(180deg);
+            -moz-transform:rotateY(180deg);
+        }
+        
+    </style>
   </head>
   <body>
     <div id="app"></div>
 
-    <video id="webcam" style="width: 1280px; height: 720px; position: abso" autoplay playsinline></video>
+    <video id="webcam"  autoplay playsinline></video>
 
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
